@@ -1,3 +1,8 @@
+const pdfjslib = require('pdfjs-dist');
+const path = require('path');
+
+pdfjslib.GlobalWorkerOptions.workerSrc = path.resolve(__dirname,'../../dist/pdf.worker.bundle.js')
+
 export class DocumentPreviewController{
 
     constructor(file){
@@ -9,7 +14,7 @@ export class DocumentPreviewController{
         
         return new Promise((s,f)=>{
 
-            console.log(this._file.type);
+            let reader = new FileReader();
             
             switch (this._file.type){
 
@@ -18,7 +23,6 @@ export class DocumentPreviewController{
                 case 'image/jpeg':
                 case 'image/gif':
                     
-                    let reader = new FileReader();
                     reader.onload = e =>{
                         s({
                             src: reader.result,
@@ -33,7 +37,41 @@ export class DocumentPreviewController{
                 break;
 
                 case 'application/pdf':
+                    // pdf to img
+                    reader.onload = e =>{
+                        
+                        pdfjslib.getDocument(new Uint8Array(reader.result)).then(pdf=>{
+                         
+                            pdf.getPage(1).then(page=>{
 
+                                let viewport = page.getViewport(1);
+
+                                let canvas = document.createElement('canvas');
+                                let context = canvas.getContext('2d');
+
+                                canvas.width = viewport.width;
+                                canvas.height = viewport.height;
+
+                                page.render({
+                                    canvasContext: context,
+                                    viewport
+                                }).then(()=>{
+                                     let _s = (pdf.numPages > 1) ? 's' : '';
+                                    s({
+                                        src:canvas.toDataURL('image/png'),
+                                        info: `${pdf.numPages} página${_s}`
+                                    });
+                                }).catch(err=>{})
+
+                            }).catch(err=>{
+                                console.log(err);
+                            });
+                        }).catch(err=>{
+                         
+                            console.log(err);
+                        })
+                    }
+                    reader.readAsArrayBuffer(this._file);
                 break;
 
                 default:

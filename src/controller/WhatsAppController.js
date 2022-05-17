@@ -1,4 +1,5 @@
 import {Format} from './../util/Format';
+import {MicrophoneController} from './MicrophoneController';
 import {CameraController} from './CameraController';
 import { DocumentPreviewController } from './DocumentPreviewController';
 
@@ -237,7 +238,7 @@ export class WhatsAppController{
             this.closeAllMainPanel();
             this.el.panelDocumentPreview.addClass('open');
             this.el.panelDocumentPreview.css({
-                'height':'100%'
+                'height':'calc(100% - 120px)'
             })
             this.el.inputDocument.click();
         })
@@ -245,6 +246,10 @@ export class WhatsAppController{
         this.el.inputDocument.on('change', e =>{
 
             if(this.el.inputDocument.files.length){
+
+                this.el.panelDocumentPreview.css({
+                    'height':'1%'
+                })
 
                 let file = this.el.inputDocument.files[0];
 
@@ -256,8 +261,16 @@ export class WhatsAppController{
                 this.el.infoPanelDocumentPreview.innerHTML = result.info;
                 this.el.imagePanelDocumentPreview.show();
                 this.el.filePanelDocumentPreview.hide();
-
                 
+                this.el.imgPanelDocumentPreview.css({
+                    'height': '84%',
+                    'margin-top': '30px'
+                })
+
+                this.el.panelDocumentPreview.css({
+                    'height':'100%'
+                })
+
                 }).catch(err=>{
 
                     console.log(file.type);
@@ -313,15 +326,23 @@ export class WhatsAppController{
             this.el.recordMicrophone.show();
             this.el.btnSendMicrophone.hide();
             this.startRecordMicrophoneTime();
+
+            this._microphoneController = new MicrophoneController();
         })
 
         this.el.btnCancelMicrophone.on('click',e=>{
+            
             this.closeRecordMicrophone();
+            this._microphoneController.stop();
         })
 
         this.el.btnFinishMicrophone.on('click',e=>{
+        
+            this._microphoneController.stop();
             this.closeRecordMicrophone();
+
         });
+
         this.el.inputText.on('kepyress',e=>{
             
             if(e.key ==="Enter" && !e.ctrlKey){
