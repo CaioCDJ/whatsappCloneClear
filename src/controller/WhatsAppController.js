@@ -21,19 +21,38 @@ export class WhatsAppController{
 
         this._firebase.initAuth().then(Response=>{
             
-            this.user = new User();
+            this._user = new User(Response.user.email);
+            console.log(Response.user);
+            // exibindo dados do usuaio
+            this._user.on('datachange',data =>{
 
-            let userRef = User.findByEmail(Response.user.email);
+                document.querySelector('title').innerHTML = data.name + 'Whatsapp Clone';
 
-            userRef.set({
-                name:Response.user.displayName,
-                email: Response.user.email,
-                photo: Response.user.photoURL
-            }).then(()=>{
+                this.el.inputNamePanelEditProfile.innerHTML = data.name;
+                
+                if(data.photo){
+
+                    let photo = this.el.imgPanelEditProfile;
+                    photo.src = data.src;
+                    photo.show();
+                    this.el.imgDefaultPanelEditProfile.hide();
+       
+                    let photo2 =  this.el.myPhoto.querySelector('img');
+                    photo2.src = data.src;
+                    photo2.show();
+                }
+            });
+            
+            this._user.name = Response.user.displayName;
+            this._user.email = Response.user.email;
+            this._user.photo = Response.user.photoURL;
+
+            this._user.save().then(()=>{
                 this.el.appContent.css({
                     display: 'flex'
-                });
+                });                
             })
+
 
         }).catch(err=>{
             console.log(err);
@@ -178,7 +197,13 @@ export class WhatsAppController{
         
         this.el.btnSavePanelEditProfile.on('click',e=>{
 
-            console.log(this.el.inputNamePanelEditProfile.innerHTML);
+            this.el.btnSavePanelEditProfile.disabled = true;
+
+            this._user.name = this.el.inputNamePanelEditProfile.innerHTML;
+
+            this._user.save().then(()=>{
+                this.el.btnSavePanelEditProfile.disabled = false;
+            });
         })
 
         // selecionando os contatos
@@ -458,7 +483,31 @@ export class WhatsAppController{
             })
         })
 
+        this.el.formPanelAddContact.on('submit',e=>{
+            
+            e.preventDefault();
 
+            let formData = new FormData(this.el.formPanelAddContact);
+
+            let contact = new User(formData.get('email'));
+
+            contact.on('datachange', data=>{
+
+                if(data.name){
+
+                    this._user.addContact(contact).then(()=>{
+
+                        this.el.btnClosePanelAddContact.click();
+                        console.info('Contato adicionado');
+                        
+                    });
+
+                }
+                else{
+                    console.error('Usúario não encontrado.')
+                }
+            })
+        })  
     }
 
 
