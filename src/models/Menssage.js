@@ -314,7 +314,7 @@ export class Message extends Model{
             default:
                 div.innerHTML =`
     
-                <div class="font-style _3DFk6 tail" id="${this.id}">
+                <div class="font-style _3DFk6 tail" id="${'_'+this.id}">
                     <span class="tail-container"></span>
                     <span class="tail-container highlight"></span>
                     <div class="Tkt2p">
@@ -334,7 +334,7 @@ export class Message extends Model{
         let classsName = (me) ? 'message-out' : 'mesasge-in';
 
         div.firstElementChild.classList.add(classsName);
-
+        console.log(Format.timeStampToTime(this.timeStamp));
         return div;
     }
 

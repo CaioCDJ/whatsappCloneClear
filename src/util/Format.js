@@ -34,6 +34,6 @@ export class Format{
 
     static timeStampToTime(timeStamp){
         // algo
-        return (timeStamp && typeof timeStamp.toDate ===' function') ? Format.dateToTime(timeStamp.toDate()) : '';
+        return (timeStamp && typeof timeStamp.toDate === 'function') ? Format.dateToTime(timeStamp.toDate()) : '';
     }
 }
