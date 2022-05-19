@@ -4,6 +4,8 @@ import {CameraController} from './CameraController';
 import { DocumentPreviewController } from './DocumentPreviewController';
 import { Firebase } from './../util/Firebase';
 import { User } from './../models/User';
+import { Chat } from './../models/Chat';
+import ContextElementDependency from 'webpack/lib/dependencies/ContextElementDependency';
 
 
 export class WhatsAppController{
@@ -592,14 +594,23 @@ export class WhatsAppController{
             let contact = new User(formData.get('email'));
 
             contact.on('datachange', data=>{
-                console.log(data, this._user);
+
                 if(data.name){
 
-                    this._user.addContact(contact).then(()=>{
+                    Chat.createIfNotExists(this._user.email, contact.email).then(chat=>{
 
-                        this.el.btnClosePanelAddContact.click();
-                        console.info('Contato adicionado');
+                        contact.chatId = chat.id;
                         
+                        this._user.chatId = chat.id;
+
+                        contact.addContact(this._user);
+
+                        this._user.addContact(contact).then(()=>{
+
+                            this.el.btnClosePanelAddContact.click();
+                            console.info('Contato adicionado');
+                            
+                        });
                     });
 
                 }
