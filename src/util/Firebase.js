@@ -65,7 +65,6 @@ export class Firebase{
                 });
 
             }).catch(err=>{
-                console.log('provider');
                 f(err);
             })  
         
