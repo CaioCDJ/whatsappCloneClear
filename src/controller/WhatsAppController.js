@@ -6,6 +6,7 @@ import { Firebase } from './../util/Firebase';
 import { User } from './../models/User';
 import { Chat } from './../models/Chat';
 import { Message } from './../models/Menssage';
+import { Base64 } from './../util/base64';
 
 
 export class WhatsAppController{
@@ -477,8 +478,8 @@ export class WhatsAppController{
             // expressao regular 
             let regex  = /^data:(.+);base64,(.*)$/;
             let result = this.el.pictureCamera.src.match(regex);
-
             let mimetype = result[1];
+
             let ext = mimetype.split('/')[1];
             let filename = `camera${Date.now()}.${ext}`;
             // invertendo a imagem
@@ -593,7 +594,30 @@ export class WhatsAppController{
         })
     
         this.el.btnSendDocument.on('click',e=>{
-            console.log('doc enviado');
+
+            let file = this.el.inputDocument.files[0];
+            let base64 = this.el.imgPanelDocumentPreview.src;
+
+            if(file.type ==='application/pdf'){
+
+                console.log(base64);
+                Base64.toFile(base64).then(filePreview =>{
+
+
+                Message.sendDocument(
+                    this._contactActive.chatId,
+                    this._user.email, file, filePreview, this.el.infoPanelDocumentPreview.innerHTML
+                );
+                })
+
+            } else {
+                Message.sendDocument(
+                    thi._contactActive.chatId,
+                    this._user.email, file
+                );
+            }
+
+            this.el.btnClosePanelDocumentPreview.click();
         })
 
         this.el.btnAttachContact.on('click',e=>{
