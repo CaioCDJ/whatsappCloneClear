@@ -202,7 +202,7 @@ export class WhatsAppController{
 
                     let data = doc.data();// ??
                     data.id = doc.id;// ??
-                    console.log(doc);
+                    console.log(doc.content);
                     let message = new Message();
                     
                     message.fromJSON(data);
@@ -700,6 +700,17 @@ export class WhatsAppController{
 
         this.el.btnFinishMicrophone.on('click',e=>{
         
+            this._microphoneController.on('recorded',(file,metadata)=>{
+
+                Message.sendAudio(
+                    this._contactActive.chatId,
+                    this._user.email,
+                    file,
+                    metadata,
+                    this._user.photo
+                );
+            })
+
             this._microphoneController.stopRecorder();
             this.closeRecordMicrophone();
 
