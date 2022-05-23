@@ -8,6 +8,7 @@ import { Chat } from './../models/Chat';
 import { Message } from './../models/Menssage';
 import { Base64 } from './../util/base64';
 import { ContactsController } from '../controller/ContactsController';
+import { Upload } from './../util/Upload';
 
 
 export class WhatsAppController{
@@ -54,10 +55,10 @@ export class WhatsAppController{
             this._user.email = Response.user.email;
             this._user.photo = Response.user.photoURL;
 
-            this._user.save().then(()=>{
+            
                 this.el.appContent.css({
                     display: 'flex'
-                });                
+            
             })
 
 
@@ -405,6 +406,28 @@ export class WhatsAppController{
         
         });
 
+        this.el.inputProfilePhoto.on('change', e=>{
+
+            console.log(this._user.photo);
+
+            if(this.el.inputProfilePhoto.files.length>0){
+
+                let file = this.el.inputProfilePhoto.files[0];
+
+                Upload.send(file,this._user.email).then(snapshot=>{
+
+                    snapshot.ref.getDownloadURL().then((url)=>{
+                        
+                        this._user.photo = url;
+                        
+                        this._user.save().then(()=>{
+                            this.el.btnClosePanelEditProfile.click();
+                        });
+                    })
+                });
+            }
+        });
+
         this.el.inputNamePanelEditProfile.on('keypress',e=>{
 
             if(e.key ==='Enter'){
@@ -419,7 +442,7 @@ export class WhatsAppController{
             this.el.btnSavePanelEditProfile.disabled = true;
 
             this._user.name = this.el.inputNamePanelEditProfile.innerHTML;
-
+            
             this._user.save().then(()=>{
                 this.el.btnSavePanelEditProfile.disabled = false;
             });
