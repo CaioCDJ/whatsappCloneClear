@@ -57,6 +57,7 @@ export class Message extends Model{
 
         let div = document.createElement('div');
         div.className = 'message';
+
         div.id = `${'_'+this.id}`;
 
         switch (this.type){
@@ -381,7 +382,7 @@ export class Message extends Model{
             `;
         }
 
-        let classsName = (me) ? 'message-out' : 'mesasge-in';
+        let classsName = (me) ? 'message-out' : 'message-in';
 
         if(me){
 
