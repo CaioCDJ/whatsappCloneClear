@@ -58,7 +58,7 @@ export class Message extends Model{
         let div = document.createElement('div');
         div.className = 'message';
 
-        div.id = `${'_'+this.id}`;
+        div.id = `_${this.id}`;
 
         switch (this.type){
 
